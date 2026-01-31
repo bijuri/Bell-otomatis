@@ -18,11 +18,11 @@ cp bell.db bell_backup_$(date +%Y%m%d_%H%M%S).db
 
 # 3. Download Update Baru
 echo "Step 2: Mengunduh paket pembaruan..."
-UPDATE_URL="https://raw.githubusercontent.com/bijuri/Bell-otomatis/refs/heads/main/bell_update_v1.3.0.zip"
+UPDATE_URL="https://github.com/bijuri/Bell-otomatis/releases/download/v1.3.0/bell_update_v1.3.0.zip"
 # Note: Jika menggunakan URL ZIP rilis GitHub, bisa disesuaikan nanti.
 # Untuk demo, kita asumsikan file zip tersedia di repo.
 
-curl -L -o update_temp.zip "https://github.com/bijuri/Bell-otomatis/raw/main/release_v130/bell_update_v1.3.0.zip"
+curl -L -o update_temp.zip "https://github.com/bijuri/Bell-otomatis/releases/download/v1.3.0/bell_update_v1.3.0.zip"
 
 if [ $? -ne 0 ]; then
     echo "Gagal mengunduh update."
