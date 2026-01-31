@@ -45,7 +45,7 @@ rm -rf temp_extract/
 
 # 7. Restart (Jika pakai systemd)
 echo "Step 6: Mencoba merestart layanan (jika ada)..."
-sudo systemctl restart bell 2>/dev/null || echo "Info: Layanan systemd tidak ditemukan, silakan restart app.py secara manual."
+sudo systemctl restart bell.service 2>/dev/null || echo "Info: Layanan systemd tidak ditemukan, silakan restart app.py secara manual."
 
 echo ""
 echo "=== UPDATE SELESAI ==="
