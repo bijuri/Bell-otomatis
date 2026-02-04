@@ -9,7 +9,7 @@ echo "=== MEMULAI INSTALASI BELL OTOMATIS ==="
 # 1. Update & Install Dependencies
 echo "Step 1: Mengunduh dependensi sistem..."
 sudo apt update
-sudo apt install -y python3 python3-pip sqlite3 mpg123 aplay
+sudo apt install -y python3 python3-pip sqlite3 mpg123 alsa-utils ffmpeg
 
 # 2. Install Flask
 echo "Step 2: Menginstall library Python..."

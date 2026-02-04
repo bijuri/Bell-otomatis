@@ -6,7 +6,7 @@ import time
 import zipfile
 import shutil
 import signal
-from flask import Flask, render_template, request, redirect, session, url_for, flash
+from flask import Flask, render_template, request, redirect, session, url_for, flash, send_file
 
 # ================= CONFIG =================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -27,28 +27,58 @@ def play_sound_file(path):
         return False
 
     audio_output = get_setting('audio_output', 'hw:1,0')
+    normalize_volume = get_setting('normalize_volume', '0') == '1'
+    target_db = get_setting('target_db', '-14')
 
     try:
+        play_path = path
+
+        # Normalize audio if enabled
+        if normalize_volume:
+            try:
+                # Create normalized temp file
+                normalized_path = os.path.join(
+                    BASE_DIR, "temp_normalized" + os.path.splitext(path)[1])
+
+                # Use ffmpeg to normalize audio (loudnorm filter for EBU R128)
+                ffmpeg_cmd = [
+                    "ffmpeg", "-y", "-i", path,
+                    "-af", f"loudnorm=I={target_db}:TP=-1.5:LRA=11",
+                    "-ar", "44100",
+                    normalized_path
+                ]
+
+                result = subprocess.run(
+                    ffmpeg_cmd,
+                    capture_output=True,
+                    timeout=30,
+                    creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS and hasattr(
+                        subprocess, 'CREATE_NO_WINDOW') else 0
+                )
+
+                if result.returncode == 0 and os.path.exists(normalized_path):
+                    play_path = normalized_path
+            except Exception as e:
+                print(f"Normalization failed, playing original: {e}")
+                play_path = path
+
         if IS_WINDOWS:
             # On Windows, use PowerShell for a reliable way to play both WAV and MP3
-            # We use System.Windows.Media.MediaPlayer which is available since .NET 3.0
-            # Note: Changing output device on Windows via PowerShell MediaPlayer is complex
-            # For now we'll stick to default, but we'll store the setting for Linux/Advanced use
             cmd = [
                 "powershell", "-c",
                 f"$m = New-Object System.Windows.Media.MediaPlayer; "
-                f"$m.Open('{path}'); "
+                f"$m.Open('{play_path}'); "
                 f"$m.Play(); "
-                f"Start-Sleep -s 1"  # Give it a moment to start
+                f"Start-Sleep -s 1"
             ]
             subprocess.Popen(cmd, creationflags=subprocess.CREATE_NO_WINDOW if hasattr(
                 subprocess, 'CREATE_NO_WINDOW') else 0)
         else:
             # Linux logic uses the setting
-            if path.lower().endswith(".wav"):
-                subprocess.Popen(["aplay", "-D", audio_output, path])
+            if play_path.lower().endswith(".wav"):
+                subprocess.Popen(["aplay", "-D", audio_output, play_path])
             else:
-                subprocess.Popen(["mpg123", "-a", audio_output, path])
+                subprocess.Popen(["mpg123", "-a", audio_output, play_path])
         return True
     except Exception as e:
         print(f"Error playing sound: {e}")
@@ -79,6 +109,10 @@ def get_db():
         "INSERT OR IGNORE INTO settings (key, value) VALUES ('ntp_server', 'pool.ntp.org')")
     conn.execute(
         "INSERT OR IGNORE INTO settings (key, value) VALUES ('timezone_region', 'Asia/Jakarta')")
+    conn.execute(
+        "INSERT OR IGNORE INTO settings (key, value) VALUES ('normalize_volume', '0')")
+    conn.execute(
+        "INSERT OR IGNORE INTO settings (key, value) VALUES ('target_db', '-14')")
 
     # Profiles Table
     conn.execute(
@@ -438,6 +472,8 @@ def pengaturan_page():
         active_profile=get_active_profile(),
         profiles=get_profiles(),
         audio_output=get_setting('audio_output', 'hw:1,0'),
+        normalize_volume=get_setting('normalize_volume', '0'),
+        target_db=get_setting('target_db', '-14'),
         time_offset=int(get_setting('time_offset', '0')),
         ntp_server=get_setting('ntp_server', 'pool.ntp.org'),
         timezone_region=get_setting('timezone_region', 'Asia/Jakarta'),
@@ -454,9 +490,16 @@ def update_audio():
         return redirect(url_for("login"))
 
     audio_output = request.form.get("audio_output", "hw:1,0")
+    normalize_volume = "1" if request.form.get("normalize_volume") else "0"
+    target_db = request.form.get("target_db", "-14")
+
     conn = get_db()
     conn.execute(
         "UPDATE settings SET value=? WHERE key='audio_output'", (audio_output,))
+    conn.execute(
+        "UPDATE settings SET value=? WHERE key='normalize_volume'", (normalize_volume,))
+    conn.execute(
+        "UPDATE settings SET value=? WHERE key='target_db'", (target_db,))
     conn.commit()
     conn.close()
     return redirect(url_for("pengaturan_page"))
@@ -653,6 +696,112 @@ def update_system():
 
     except Exception as e:
         return f"Update Gagal: {e}", 500
+
+
+@app.route("/backup_system", methods=["POST"])
+def backup_system():
+    if check_timeout():
+        return redirect(url_for("login"))
+
+    backup_db = request.form.get("backup_db")
+    backup_sounds = request.form.get("backup_sounds")
+
+    backup_filename = f"backup_bell_{int(time.time())}.zip"
+    backup_path = os.path.join(BASE_DIR, backup_filename)
+
+    try:
+        with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            if backup_db:
+                if os.path.exists(DB):
+                    zipf.write(DB, "bell.db")
+
+            if backup_sounds:
+                if os.path.exists(SOUND_DIR):
+                    for root, dirs, files in os.walk(SOUND_DIR):
+                        for file in files:
+                            file_path = os.path.join(root, file)
+                            rel_path = os.path.join(
+                                "static/sounds", os.path.relpath(file_path, SOUND_DIR))
+                            zipf.write(file_path, rel_path)
+
+        # Send file and then delete it
+        # We use a wrapper or just trust flask behavior
+        # Note: send_file doesn't delete automatically, we can use a generator or cleanup after
+        return send_file(backup_path, as_attachment=True)
+    except Exception as e:
+        return f"Backup Gagal: {e}", 500
+
+
+@app.route("/restore_backup", methods=["POST"])
+def restore_backup():
+    if check_timeout():
+        return redirect(url_for("login"))
+
+    file = request.files.get('restore_zip')
+    if not file or not file.filename.endswith('.zip'):
+        flash("File tidak valid. Harap upload file .zip", "error")
+        return redirect(url_for("pengaturan_page"))
+
+    restore_path = os.path.join(BASE_DIR, "temp_restore.zip")
+    extract_path = os.path.join(BASE_DIR, "temp_restore_extract")
+
+    try:
+        # Save uploaded file
+        file.save(restore_path)
+
+        # Auto-backup current database before restore
+        auto_backup_path = os.path.join(
+            BASE_DIR, f"auto_backup_before_restore_{int(time.time())}.zip")
+        with zipfile.ZipFile(auto_backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            if os.path.exists(DB):
+                zipf.write(DB, "bell.db")
+            if os.path.exists(SOUND_DIR):
+                for root, dirs, files in os.walk(SOUND_DIR):
+                    for f in files:
+                        file_path = os.path.join(root, f)
+                        rel_path = os.path.join(
+                            "static/sounds", os.path.relpath(file_path, SOUND_DIR))
+                        zipf.write(file_path, rel_path)
+
+        # Clear old extract path if exists
+        if os.path.exists(extract_path):
+            shutil.rmtree(extract_path)
+        os.makedirs(extract_path)
+
+        # Extract backup
+        with zipfile.ZipFile(restore_path, 'r') as zip_ref:
+            zip_ref.extractall(extract_path)
+
+        # Restore database
+        backup_db_path = os.path.join(extract_path, "bell.db")
+        if os.path.exists(backup_db_path):
+            shutil.copy2(backup_db_path, DB)
+
+        # Restore sounds
+        backup_sounds_path = os.path.join(extract_path, "static", "sounds")
+        if os.path.exists(backup_sounds_path):
+            os.makedirs(SOUND_DIR, exist_ok=True)
+            for f in os.listdir(backup_sounds_path):
+                src = os.path.join(backup_sounds_path, f)
+                dst = os.path.join(SOUND_DIR, f)
+                if os.path.isfile(src):
+                    shutil.copy2(src, dst)
+
+        # Cleanup
+        shutil.rmtree(extract_path)
+        os.remove(restore_path)
+
+        flash("Restore berhasil! Data telah dipulihkan dari backup.", "success")
+        return redirect(url_for("pengaturan_page"))
+
+    except Exception as e:
+        # Cleanup on error
+        if os.path.exists(extract_path):
+            shutil.rmtree(extract_path)
+        if os.path.exists(restore_path):
+            os.remove(restore_path)
+        flash(f"Restore Gagal: {e}", "error")
+        return redirect(url_for("pengaturan_page"))
 
 
 # ================= RUN =================
