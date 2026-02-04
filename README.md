@@ -1,7 +1,5 @@
 # Bell-otomatis
 
-# Bell Otomatis v1.3.0 - Release Notes
-
 ## 📋 Deskripsi
 Pembaruan besar ini menghadirkan fitur sinkronisasi waktu internet, manajemen profil mandiri, dan sistem pembaruan manual via dashboard.
 
