@@ -1,11 +1,13 @@
 {
-  "version": "1.5.0",
-  "date": "2026-02-04",
-  "download_url": "https://github.com/bijuri/Bell-otomatis/releases/download/v1.5.0/bell_update_v1.5.0.zip",
+  "version": "1.5.1",
+  "date": "2026-02-05",
+  "download_url": "https://github.com/bijuri/Bell-otomatis/releases/download/v1.5.1/bell_update_v1.5.1.zip",
   "changelog": [
-    "Otomatisasi Service (Linux): Membuat bell.service",
-    "Web Auto-Update: Cek dan instal update dari Dashboard",
-    "Konfigurasi URL Update di Pengaturan",
-    "Perbaikan Izin Akses Linux (v1.4.2)"
+    "Izin Akses (Permissions): Otomatis perbaiki folder static agar tidak terkunci",
+    "Robust Audio Detection: Deteksi soundcard lebih akurat menggunakan kombinasi aplay -L & aplay -l",
+    "Multi-Upload: Bisa upload banyak file suara sekaligus",
+    "Countdown Login: Lihat detik bell berikutnya di halaman login",
+    "Edit Profil: Tombol pensil untuk mengubah nama profil",
+    "Perbaikan Tombol Play: Fix manual play di daftar jadwal"
   ]
 }
