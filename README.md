@@ -10,6 +10,8 @@ Pembaruan besar ini menghadirkan fitur sinkronisasi waktu internet, manajemen pr
 - **🆙 Manual Update**: Fitur unggah file ZIP langsung dari browser untuk update script tanpa menyentuh terminal.
 - **🔊 Perbaikan Audio**: Pemilihan soundcard yang lebih stabil di Linux & Windows.
 
+##PIN Default 1996
+
 
 
 # 1. Update sistem dan instal unzip jika belum ada
