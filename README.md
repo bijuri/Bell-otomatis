@@ -21,8 +21,8 @@ mkdir -p ~/bell && cd ~/bell
 # 3. Download file ZIP rilis
 curl -L -o bell_install.zip https://github.com/bijuri/Bell-otomatis/releases/download/v1.5.0/bell_fresh_install_v1.5.0.zip
 # 4. Ekstrak file
-unzip bell_install.zip
-rm bell_install.zip
+-unzip bell_install.zip
+-rm bell_install.zip
 # 5. Jalankan script instalasi otomatis
 # Script ini akan menginstal Python, Flask, dan membuat bell.service (systemd)
 
