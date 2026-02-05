@@ -25,5 +25,7 @@ unzip bell_install.zip
 rm bell_install.zip
 # 5. Jalankan script instalasi otomatis
 # Script ini akan menginstal Python, Flask, dan membuat bell.service (systemd)
-chmod +x install.sh
-./install.sh
+
+- chmod +x install.sh
+
+- ./install.sh
