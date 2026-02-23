@@ -1,15 +1,11 @@
 {
   "version": "1.5.2",
   "date": "2026-02-23",
-  "download_url": "https://github.com/bijuri/Bell-otomatis/releases/download/1.5.2/bell_fresh_install_v1.5.2.zip",
+  "download_url": "https://github.com/bijuri/Bell-otomatis/releases/download/1.5.2/bell_update_v1.5.2.zip",
   "changelog": [
-        "Audio Failover (Linux): Sistem otomatis mendeteksi speaker offline dan dialihkan ke speaker cadangan",
-        "Dashboard Monitoring: Halaman baru /monitoring untuk status internet, uptime, dan audio health",
-        "TV Mode Gamified: Animasi countdown melingkar, bounce 10 detik terakhir, dan selebrasi visual",
-        "Live Logs: Pantau aktivitas bell langsung dari dashboard",
-        "Otomatisasi Izin Linux: Install script lebih cerdas mendeteksi user sistem (www-data)"
   ]
 }
+
 
 
 
