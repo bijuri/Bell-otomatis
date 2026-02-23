@@ -1,15 +1,15 @@
 {
-  "version": "1.5.1",
-  "date": "2026-02-05",
-  "download_url": "https://github.com/bijuri/Bell-otomatis/releases/download/v1.5.1/bell_update_v1.5.1.zip",
+  "version": "1.5.2",
+  "date": "2026-02-23",
+  "download_url": "https://github.com/bijuri/Bell-otomatis/releases/download/1.5.2/bell_fresh_install_v1.5.2.zip",
   "changelog": [
-    "Izin Akses (Permissions): Otomatis perbaiki folder static agar tidak terkunci",
-    "Robust Audio Detection: Deteksi soundcard lebih akurat menggunakan kombinasi aplay -L & aplay -l",
-    "Multi-Upload: Bisa upload banyak file suara sekaligus",
-    "Countdown Login: Lihat detik bell berikutnya di halaman login",
-    "Edit Profil: Tombol pensil untuk mengubah nama profil",
-    "Perbaikan Tombol Play: Fix manual play di daftar jadwal"
+        "Audio Failover (Linux): Sistem otomatis mendeteksi speaker offline dan dialihkan ke speaker cadangan",
+        "Dashboard Monitoring: Halaman baru /monitoring untuk status internet, uptime, dan audio health",
+        "TV Mode Gamified: Animasi countdown melingkar, bounce 10 detik terakhir, dan selebrasi visual",
+        "Live Logs: Pantau aktivitas bell langsung dari dashboard",
+        "Otomatisasi Izin Linux: Install script lebih cerdas mendeteksi user sistem (www-data)"
   ]
 }
+
 
 
