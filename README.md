@@ -19,7 +19,7 @@ sudo apt update && sudo apt install -y unzip curl
 # 2. Buat folder untuk aplikasi
 mkdir -p ~/bell && cd ~/bell
 # 3. Download file ZIP rilis
-curl -L -o bell_install.zip https://github.com/bijuri/Bell-otomatis/releases/download/v1.5.0/bell_fresh_install_v1.5.0.zip
+curl -L -o bell_install.zip https://github.com/bijuri/Bell-otomatis/releases/download/v1.7.0/bell_compiled_v1.7.0.zip
 # 4. Ekstrak file
 
 -unzip bell_install.zip
