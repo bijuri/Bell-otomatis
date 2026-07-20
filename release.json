@@ -1,12 +1,16 @@
 {
-  "version": "1.5.5",
-  "date": "2026-03-2",
-  "download_url": "https://github.com/bijuri/Bell-otomatis/releases/download/1.5.5/update_linux_v155.zip",
-  "changelog": [
-  ]
+    "version": "1.7.0",
+    "release_date": "2026-07-20",
+    "download_url": "https://github.com/bijuri/Bell-otomatis/releases/download/v1.7.0/bell_compiled_v1.7.0.zip",
+    "changelog": [
+        "Tampilan Premium Dark Glassmorphic UI & Mode Terang",
+        "Tombol Khusus Masuk Panel Admin & Toggle Tema \ud83c\udf13",
+        "Multi-Server Fallback Murottal Acak (4 Server)",
+        "Peralihan model Gemini TTS otomatis jika limit kuota",
+        "Perbaikan naturalDuration & penanganan tanda petik audio di Windows",
+        "Auto-inisialisasi sinkronisasi versi database"
+    ]
 }
-
-
 
 
 
